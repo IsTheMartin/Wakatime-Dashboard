@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wakatime_dashboard/infrastructure/models/user_data.dart';
 import 'package:wakatime_dashboard/infrastructure/sources/remote/api_services.dart';
+import 'package:wakatime_dashboard/presentation/widgets/language_chart.dart';
+
+import '../../infrastructure/models/user_data.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -12,6 +14,8 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  final GlobalKey<LanguageChartState> languageState =
+      GlobalKey<LanguageChartState>();
   UserData? userData;
   bool is7Day = true;
 
@@ -40,7 +44,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text("WakaTime")),
       body: Column(
-        children: [Text(userData?.summaryData.toString() ?? "No data")],
+        children: [
+          (userData != null)
+              ? LanguageChart(key: languageState, userData: userData!)
+              : Container()
+        ],
       ),
     );
   }
@@ -53,5 +61,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         print(userData?.summaryData.length);
       });
     });
+  }
+
+  updateCharts(UserData userData) {
+    languageState.currentState?.buildChart(userData);
   }
 }
